@@ -1,15 +1,16 @@
-from django.contrib import admin
 from django.urls import path, include
-from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
+from django.contrib.auth.decorators import login_required
+from rest_framework.routers import DefaultRouter
+from core.api import MessageModelViewSet, UserModelViewSet
+
+router = DefaultRouter()
+router.register(r'message', MessageModelViewSet, base_name='message-api')
+router.register(r'user', UserModelViewSet, base_name='user-api')
 
 urlpatterns = [
+    path(r'api/v1/', include(router.urls)),
 
-    path('admin/', admin.site.urls),
-
-    path('', include('core.urls')),
-
-    path('login/', auth_views.login, name='login'),
-
-    path('logout/', auth_views.logout, {'next_page': '/'}, name='logout', )
-
+    path('', login_required(
+        TemplateView.as_view(template_name='core/chat.html')), name='home'),
 ]
